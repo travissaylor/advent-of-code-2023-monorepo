@@ -67,6 +67,15 @@ function parseGameResultFromText(rawText: string): GameResult {
     return { id, record: cubesRevealed }
 }
 
+function getPowerSumFromResults(results: GameResult[]): number {
+    let powerSum = 0
+    results.forEach((result) => {
+        const { record } = result
+        powerSum += record.blue * record.green * record.red
+    })
+    return powerSum
+}
+
 function ValidGamesSumFromResults(results: GameResult[]): number {
     let validGamesSum = 0
     results.forEach((result) => {
@@ -96,8 +105,10 @@ function execute() {
     )
     const gameResults = getGameResults(rawTextResults)
     const validGamesSum = ValidGamesSumFromResults(gameResults)
+    const powerSum = getPowerSumFromResults(gameResults)
 
     console.log(`Valid Games Sum: ${validGamesSum}`)
+    console.log(`Power Sum: ${powerSum}`)
 }
 
 execute()
