@@ -46,6 +46,22 @@ importers:
       tsx: 4.6.2
       typescript: 5.3.2
 
+  apps/03:
+    specifiers:
+      '@repo/eslint-config': workspace:*
+      '@repo/typescript-config': workspace:*
+      '@types/node': ^20.10.2
+      ts-node: ^10.9.1
+      tsx: 4.6.2
+      typescript: ^5.3.2
+    devDependencies:
+      '@repo/eslint-config': link:../../packages/eslint-config
+      '@repo/typescript-config': link:../../packages/typescript-config
+      '@types/node': 20.10.2
+      ts-node: 10.9.1_lhw3zvecfcig6fwb27v2ic2dvm
+      tsx: 4.6.2
+      typescript: 5.3.2
+
   packages/eslint-config:
     specifiers:
       '@typescript-eslint/eslint-plugin': ^6.11.0
