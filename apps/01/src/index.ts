@@ -24,9 +24,9 @@ const wordNumberMap = {
 } as const
 
 function assertWordNumber(
-    wordNumber: string
+    wordNumber: string | undefined
 ): asserts wordNumber is keyof typeof wordNumberMap {
-    if (!(wordNumber in wordNumberMap)) {
+    if (!wordNumber || !(wordNumber in wordNumberMap)) {
         throw new Error(`Word number not found: ${wordNumber}`)
     }
 }
