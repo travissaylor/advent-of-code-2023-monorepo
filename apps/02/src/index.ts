@@ -1,14 +1,59 @@
 import * as fs from "fs"
 
+const maxCubesAlled: CubesRevealed = {
+    blue: 14,
+    green: 13,
+    red: 12,
+} as const
+
 type CubesRevealed = {
     blue: number
     green: number
     red: number
 }
 
-type GameResult = { index: number; record: CubesRevealed[] }
+type GameResult = { id: number; record: CubesRevealed }
 
-function parseIndexFromText(rawText: string): number {
+function assertColor(
+    color: string | undefined
+): asserts color is keyof CubesRevealed {
+    if (!color || !["blue", "green", "red"].includes(color)) {
+        throw new Error("Invalid color")
+    }
+}
+
+function parseCubesRevealedFromText(rawText: string): CubesRevealed {
+    const allCubesRevealedString = rawText.split(": ")[1]
+    if (!allCubesRevealedString) {
+        throw new Error("Invalid cubes revealed")
+    }
+    const allCubesRevealedArray = allCubesRevealedString.split("; ")
+    const largestCubesRevealed: CubesRevealed = {
+        blue: 0,
+        green: 0,
+        red: 0,
+    }
+
+    allCubesRevealedArray.forEach((cubesRevealedString) => {
+        const cubesRevealedArray = cubesRevealedString.split(", ")
+        cubesRevealedArray.forEach((cubeRevealedString) => {
+            const [numberString, color] = cubeRevealedString.split(" ")
+            if (!numberString || !color) {
+                throw new Error("Invalid cube revealed")
+            }
+            assertColor(color)
+            const number = parseInt(numberString)
+            if (number > largestCubesRevealed[color]) {
+                largestCubesRevealed[color] = number
+            }
+        })
+        return largestCubesRevealed
+    })
+
+    return largestCubesRevealed
+}
+
+function parseIdFromText(rawText: string): number {
     const indexString = rawText.split("Game ")[1]?.split(":")[0]
     if (!indexString) {
         throw new Error("Invalid index")
@@ -17,9 +62,23 @@ function parseIndexFromText(rawText: string): number {
 }
 
 function parseGameResultFromText(rawText: string): GameResult {
-    const cubesRevealed: CubesRevealed[] = []
-    const index = parseIndexFromText(rawText)
-    return { index, record: cubesRevealed }
+    const cubesRevealed = parseCubesRevealedFromText(rawText)
+    const id = parseIdFromText(rawText)
+    return { id, record: cubesRevealed }
+}
+
+function ValidGamesSumFromResults(results: GameResult[]): number {
+    let validGamesSum = 0
+    results.forEach((result) => {
+        const { record } = result
+        const isBlueValid = record.blue <= maxCubesAlled.blue
+        const isGreenValid = record.green <= maxCubesAlled.green
+        const isRedValid = record.red <= maxCubesAlled.red
+        if (isBlueValid && isGreenValid && isRedValid) {
+            validGamesSum += result.id
+        }
+    })
+    return validGamesSum
 }
 
 function getGameResults(rawTextResults: string[]): GameResult[] {
@@ -36,7 +95,9 @@ function execute() {
         "adventofcode.com_2023_day_2_input.txt"
     )
     const gameResults = getGameResults(rawTextResults)
-    console.log(gameResults)
+    const validGamesSum = ValidGamesSumFromResults(gameResults)
+
+    console.log(`Valid Games Sum: ${validGamesSum}`)
 }
 
 execute()
